@@ -1,0 +1,15 @@
+name: osaka
+description: Blog-aware static code generator for Jekyll-style Markdown posts in Flutter.
+version: 0.0.1
+author: Mehmet Oguz Derin
+homepage:
+
+environment:
+  sdk: ">=2.1.0 <3.0.0"
+
+dependencies:
+  build: any
+  dart_style: any
+  glob: any
+  path: any
+  yaml: any

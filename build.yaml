@@ -1,0 +1,10 @@
+builders:
+  osaka:
+    import: "package:osaka/osaka.dart"
+    builder_factories:
+      - "osaka"
+    build_extensions:
+      "$package$":
+        - "lib/posts_build.dart"
+    auto_apply: root_package
+    build_to: source
