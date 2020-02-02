@@ -13,8 +13,8 @@ class Osaka implements Builder {
   // Match `build_extensions` of `build.yaml`
   @override
   Map<String, List<String>> get buildExtensions {
-    return const {
-      r'$package$': const ['lib/posts_build.dart'],
+    return {
+      r'$package$': ['lib/posts_build.dart'],
     };
   }
 
@@ -52,7 +52,7 @@ class Osaka implements Builder {
 
           if (!parsedFrontMatter) {
             if (!hasFrontMatterStart) {
-              if (lineContent.length == 0) {
+              if (lineContent.isEmpty) {
                 continue;
               } else {
                 if (lineContent == "---") {
@@ -73,9 +73,9 @@ class Osaka implements Builder {
                   building += ',';
                 }
               } else {
-                if (lineContent.length > 0) {
+                if (lineContent.isNotEmpty) {
                   // Add new line if not the first line
-                  if (frontMatter.length > 0) {
+                  if (frontMatter.isNotEmpty) {
                     frontMatter += '\n';
                   }
 
@@ -84,9 +84,9 @@ class Osaka implements Builder {
               }
             }
           } else {
-            if (lineContent.length > 0) {
+            if (lineContent.isNotEmpty) {
               // Add new line if not the first line
-              if (markDown.length > 0) {
+              if (markDown.isNotEmpty) {
                 markDown += '\n';
               }
 
@@ -95,7 +95,7 @@ class Osaka implements Builder {
           }
         }
 
-        if (markDown.length > 0) {
+        if (markDown.isNotEmpty) {
           building += '\'markDown\': r\'\'\'';
           building += markDown;
           building += '\'\'\',';
