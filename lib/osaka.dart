@@ -25,20 +25,10 @@ class OsakaTotal implements Builder {
   <link rel="apple-touch-icon" href="../../../../../icons/Icon-192.png">
 
   <title>osaka_total_build_step_input_id_package</title>
-  <link rel="manifest" href="../../../../../manifest.json">
 </head>
 <body>
-  <!-- This script installs service_worker.js to provide PWA functionality to
-       application. For more information, see:
-       https://developers.google.com/web/fundamentals/primers/service-workers -->
   <script>
     window.osakaPost = "";
-    
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', function () {
-        navigator.serviceWorker.register('../../../../../flutter_service_worker.js');
-      });
-    }
   </script>
   <script src="../../../../../main.dart.js" type="application/javascript"></script>
 </body>

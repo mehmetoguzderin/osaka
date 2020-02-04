@@ -1,6 +1,6 @@
 name: osaka
 description: Blog-aware static code generator for Jekyll-style Markdown posts with Flutter.
-version: 0.0.4
+version: 0.0.5
 homepage: https://github.com/mehmetoguzderin/osaka
 
 environment:

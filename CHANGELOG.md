@@ -1,3 +1,7 @@
+## [0.0.5] - 2020 02 05
+
+* Disable PWA.
+
 ## [0.0.4] - 2020 02 05
 
 * Check filename correctness for posts.
