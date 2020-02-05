@@ -171,7 +171,7 @@ void main() async {
       final groups = exp.firstMatch(name).groups(<int>[1, 2, 3, 4]).toList();
       if (groups.length == 4) {
         var lines = LineSplitter.split(await buildStep.readAsString(input));
-        String frontmatter = null;
+        String frontmatter;
 
         var index = 0;
         for (final line in lines) {
@@ -193,13 +193,13 @@ void main() async {
           }
         }
 
-        String markdown = null;
+        String markdown;
 
         for (final line in lines.skip(index)) {
           index++;
 
           if (markdown == null) {
-            if (line.trim().length > 0) {
+            if (line.trim().isNotEmpty) {
               markdown = line;
               markdown += '\n';
             }

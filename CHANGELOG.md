@@ -1,3 +1,7 @@
+## [0.0.8] - 2020 02 06
+
+* Create web directory.
+
 ## [0.0.7] - 2020 02 06
 
 * Generate post type.
