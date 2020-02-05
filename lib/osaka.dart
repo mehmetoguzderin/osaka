@@ -11,29 +11,6 @@ import 'package:yaml/yaml.dart';
 
 // Define Builder
 class OsakaTotal implements Builder {
-  static const index = r'''<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="UTF-8">
-  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
-  <meta name="description" content="">
-
-  <!-- iOS meta tags & icons -->
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-status-bar-style" content="black">
-  <meta name="apple-mobile-web-app-title" content="osaka_total_build_step_input_id_package">
-  <link rel="apple-touch-icon" href="../../../../../icons/Icon-192.png">
-
-  <title>osaka_total_build_step_input_id_package</title>
-</head>
-<body>
-  <script>
-    window.osakaPost = "";
-  </script>
-  <script src="../../../../../main.dart.js" type="application/javascript"></script>
-</body>
-</html>''';
-
   static const tool = r'''import 'dart:convert';
 import 'dart:io';
 import 'package:path/path.dart' as p;
@@ -111,6 +88,7 @@ void main() async {
   // Generate code for posts
   @override
   Future<void> build(BuildStep buildStep) async {
+    final index = await File('web/index_post.html').readAsString();
     final exp = RegExp('(\\d{4})-(\\d{2})-(\\d{2})-(.*)\\.md');
 
     var posts = [];
