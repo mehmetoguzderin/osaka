@@ -9,6 +9,74 @@ import 'package:glob/glob.dart';
 import 'package:path/path.dart' as p;
 import 'package:yaml/yaml.dart';
 
+class _PostsBuild {
+  final String name;
+  final String frontmatter;
+  final String markdown;
+  final String year;
+  final String month;
+  final String day;
+  final String layout;
+  final String title;
+  final List<String> categories;
+  final List<String> author;
+
+  const _PostsBuild({
+    this.name,
+    this.frontmatter,
+    this.markdown,
+    this.year,
+    this.month,
+    this.day,
+    this.layout,
+    this.title,
+    this.categories,
+    this.author,
+  });
+
+  @override
+  String toString() {
+    return '''const _PostsBuild(
+  name: r\'\'\'${this.name}\'\'\',
+  frontmatter: r\'\'\'${this.frontmatter}\'\'\',
+  markdown: r\'\'\'${this.markdown}\'\'\',
+  year: r\'\'\'${this.year}\'\'\',
+  month: r\'\'\'${this.month}\'\'\',
+  day: r\'\'\'${this.day}\'\'\',
+  layout: r\'\'\'${this.layout}\'\'\',
+  title: r\'\'\'${this.title}\'\'\',
+  categories: const [${this.categories.map((e) => 'r\'\'\'' + e + '\'\'\'').join(', ')}],
+  author: const [${this.author.map((e) => 'r\'\'\'' + e + '\'\'\'').join(', ')}],
+)''';
+  }
+
+  static const String postsBuild = r'''class _PostsBuild {
+  final String name;
+  final String frontmatter;
+  final String markdown;
+  final String year;
+  final String month;
+  final String day;
+  final String layout;
+  final String title;
+  final List<String> categories;
+  final List<String> author;
+
+  const _PostsBuild({
+    this.name,
+    this.frontmatter,
+    this.markdown,
+    this.year,
+    this.month,
+    this.day,
+    this.layout,
+    this.title,
+    this.categories,
+    this.author,
+  });
+}''';
+}
+
 // Define Builder
 class OsakaTotal implements Builder {
   static const tool = r'''import 'dart:convert';
@@ -39,6 +107,10 @@ void main() async {
 
     fontManifest = _fontManifest.replaceAll(
         '"asset":"', '"asset":"../../../../../../assets/');
+  }
+
+  if (await File('build/web/index_post.html').exists()) {
+    await File('build/web/index_post.html').delete();
   }
 
   if (await Directory('build/web/blog').exists()) {
@@ -89,102 +161,95 @@ void main() async {
   @override
   Future<void> build(BuildStep buildStep) async {
     final index = await File('web/index_post.html').readAsString();
+
     final exp = RegExp('(\\d{4})-(\\d{2})-(\\d{2})-(.*)\\.md');
 
-    var posts = [];
-
-    var building = 'class PostsBuild { static const posts = {';
+    Map<String, _PostsBuild> posts = {};
 
     await for (final input in buildStep.findAssets(Glob('assets/posts/*'))) {
-      if (input.path.endsWith('.md')) {
-        // Load post
-        var name = Uri.file(input.path).pathSegments.last;
-        // (year, month, day)
-        final groups = exp.firstMatch(name).groups(<int>[1, 2, 3, 4]).toList();
+      var name = Uri.file(input.path).pathSegments.last;
+      final groups = exp.firstMatch(name).groups(<int>[1, 2, 3, 4]).toList();
+      if (groups.length == 4) {
+        var lines = LineSplitter.split(await buildStep.readAsString(input));
+        String frontmatter = null;
 
-        if (groups.length == 4) {
-          var text = await buildStep.readAsString(input);
+        var index = 0;
+        for (final line in lines) {
+          index++;
 
-          // Add comma if not the first post
-          if (!building.endsWith('{')) {
-            building += ',';
-          }
-
-          building += '\'';
-          building += name;
-          building += '\':{';
-
-          // Declare post content
-          var frontMatter = "";
-          var markDown = "";
-
-          // Declare front matter state
-          var hasFrontMatterStart = false;
-          var parsedFrontMatter = false;
-
-          for (var line in LineSplitter.split(text)) {
-            // Clean for analysis
-            var lineContent = line.trim();
-
-            if (!parsedFrontMatter) {
-              if (!hasFrontMatterStart) {
-                if (lineContent.isEmpty) {
-                  continue;
-                } else {
-                  if (lineContent == "---") {
-                    hasFrontMatterStart = true;
-                  } else {
-                    parsedFrontMatter = true;
-                  }
-                }
-              } else {
-                if (lineContent == "---") {
-                  parsedFrontMatter = true;
-
-                  if (hasFrontMatterStart) {
-                    building += '\'frontMatter\':';
-                    // Convert front matter to JSON to embed to Dart
-                    // TODO: Should convert double quotes to single quotes
-                    building += json.encode(loadYaml(frontMatter));
-                    building += ',';
-                  }
-                } else {
-                  if (lineContent.isNotEmpty) {
-                    // Add new line if not the first line
-                    if (frontMatter.isNotEmpty) {
-                      frontMatter += '\n';
-                    }
-
-                    frontMatter += line;
-                  }
-                }
-              }
+          if (line.trim() == '---') {
+            if (frontmatter == null) {
+              frontmatter = '';
             } else {
-              if (lineContent.isNotEmpty) {
-                // Add new line if not the first line
-                if (markDown.isNotEmpty) {
-                  markDown += '\n';
-                }
-
-                markDown += line;
-              }
+              break;
+            }
+          } else {
+            if (frontmatter == null) {
+              break;
+            } else {
+              frontmatter += line.trim();
+              frontmatter += '\n';
             }
           }
-
-          if (markDown.isNotEmpty) {
-            building += '\'markDown\': r\'\'\'';
-            building += markDown;
-            building += '\'\'\',';
-          }
-
-          building += '}';
-
-          posts.add([name, groups[0], groups[1], groups[2], groups[3]]);
         }
+
+        String markdown = null;
+
+        for (final line in lines.skip(index)) {
+          index++;
+
+          if (markdown == null) {
+            if (line.trim().length > 0) {
+              markdown = line;
+              markdown += '\n';
+            }
+          } else {
+            markdown += line.trim();
+            markdown += '\n';
+          }
+        }
+
+        var _frontmatter = loadYaml(frontmatter);
+
+        List<String> categories = [];
+        for (final category in _frontmatter['categories']) {
+          categories.add(category as String);
+        }
+
+        List<String> authors = [];
+        for (final author in _frontmatter['author']) {
+          authors.add(author as String);
+        }
+
+        posts[name] = _PostsBuild(
+          name: groups[3],
+          frontmatter: frontmatter,
+          markdown: markdown,
+          year: groups[0],
+          month: groups[1],
+          day: groups[2],
+          layout: _frontmatter['layout'],
+          title: _frontmatter['title'],
+          categories: categories,
+          author: authors,
+        );
       }
     }
 
-    building += '}; }';
+    String building = _PostsBuild.postsBuild;
+    building += '\n';
+    building += '\n';
+    building +=
+        r'''class PostsBuild { static const Map<String, _PostsBuild> posts = {''';
+
+    for (final key in posts.keys.toList().reversed) {
+      building += '\n';
+      building += 'r\'\'\'${key}\'\'\': ';
+      building += posts[key].toString();
+      building += ',';
+    }
+    building += '\n';
+    building += r'''}; }''';
 
     if (await File('tool/osaka.dart').exists()) {
       await File('tool/osaka.dart').delete();
@@ -203,16 +268,17 @@ void main() async {
       final packageIndex = index.replaceAll(
           'osaka_total_build_step_input_id_package', buildStep.inputId.package);
 
-      for (final post in posts) {
+      for (final post in posts.keys) {
         final directory = await Directory(
-                'web/blog/${post[1]}/${post[2]}/${post[3]}/${post[4]}')
+                'web/blog/${posts[post].year}/${posts[post].month}/${posts[post].day}/${posts[post].name}')
             .create(recursive: true);
         if (await directory.exists()) {
           final file =
               await File(p.join(directory.path, 'index.html')).create();
           if (await file.exists()) {
             await file.writeAsString(packageIndex.replaceAll(
-                'window.osakaPost = ""', 'window.osakaPost = "${post[0]}"'));
+                '<script id="osaka-post" type="text">osaka_total_build_step_post_name</script>',
+                '<script id="osaka-post" type="text">${post}</script>'));
           }
         }
       }

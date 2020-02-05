@@ -1,3 +1,7 @@
+## [0.0.7] - 2020 02 06
+
+* Generate post type.
+
 ## [0.0.6] - 2020 02 05
 
 * Generate Osaka Tool.
