@@ -15,4 +15,4 @@ samples, guidance on mobile development, and a full API reference.
 
 ## Usage
 
-Add `build_runner: any` and `osaka: any` to `dev_dependencies`, have some posts under `assets/posts` and run `flutter pub run build_runner build`.
+Add `build_runner: any` and `osaka: any` to `dev_dependencies`, have some posts under `assets/posts`, run `flutter pub run build_runner build`, build with `flutter build web` and run `flutter pub run tool/osaka.dart`.
