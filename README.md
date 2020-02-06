@@ -1,6 +1,6 @@
 # osaka
 
-A new Flutter package project.
+Blog-aware static code generator for Jekyll-style Markdown posts with Flutter.
 
 ## Getting Started
 
